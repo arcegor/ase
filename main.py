@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 from ProcessManager import ProcessManager
 from ui import Ui_Upload
@@ -22,7 +22,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonProcess.setDisabled(True)
         self.ui.buttonGet.setDisabled(True)
         self.fm = FileManager()
-        self.pm = ProcessManager()
 
     def buttonUpload_clicked(self):
         filenames, _ = QFileDialog.getOpenFileNames(
@@ -37,23 +36,25 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         for filename in filenames:
             self.fm.data[filename] = pd.read_excel(filename)
+        if not self.fm.validate():
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Документы не соответствуют шаблону!")
+            msg.setWindowTitle("Ошибка валидации!")
+            msg.exec_()
+            return
         self.ui.files.setText('\n'.join(str(x) for x in self.fm.data.keys()))
         self.ui.buttonProcess.setEnabled(True)
         self.ui.buttonUpload.setDisabled(True)
 
     def buttonProcess_clicked(self):
-        #self.fm.process_all(self.ui.progressBar)
-        self.pm.find_collisions(self.fm.data)
-        self.ui.progressBar.setValue(100)
-        self.ui.progressBar.setFormat('{0:.2f}%'.format(100))
+        self.fm.pm.find_collisions(self.fm.data)
         self.ui.buttonGet.setEnabled(True)
         self.ui.buttonProcess.setDisabled(True)
 
     def buttonGet_clicked(self):
-        self.fm.get_item()
-        self.ui.progressBar.setValue(0)
-        self.ui.progressBar.setFormat('{0:.2f}%'.format(0))
-        self.fm = FileManager()
+        self.fm.get_result(self.fm.result)
+        self.fm.clear()
         self.ui.files.setText('')
         self.ui.buttonUpload.setEnabled(True)
         self.ui.buttonGet.setDisabled(True)

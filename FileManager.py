@@ -1,33 +1,30 @@
-import os
-import re
-import shutil
+import gc
 
 import pandas as pd
+
+from ProcessManager import ProcessManager
 
 
 class FileManager(object):
 
     def __init__(self):
         self.data = {}
-        self.files = []
+        self.pm = ProcessManager()
+        self.result = {}
 
-    @staticmethod
-    def create_item(df, fname):
-        path = os.getcwd() + '/TEMP'
-        name = 'processed_' + re.split('/', fname)[-1]
-        if not os.path.exists(path):
-            os.makedirs(path)
-        filepath = os.path.join(path, name)
-        df.to_excel(filepath)
-        return filepath
+    def validate(self) -> bool:
+        # TO DO: (Ваня, это пункт 2-3 в ТЗ)
+        # сделать проверку данных на соответствие шаблону
+        # Результ True если все хорошо, False - иначе (тип bool)
+        pass
 
-    def get_item(self):
-        path = os.getcwd() + '/RESULT'
-        if not os.path.exists(path):
-            os.makedirs(path)
-        for item in self.files:
-            shutil.copy(item, path)
-            file_to_delete = item
-            os.remove(file_to_delete)
-        if len(os.listdir(os.getcwd() + '/TEMP')) == 0:
-            os.rmdir(os.getcwd() + '/TEMP')
+    def get_result(self, result: list[pd.DataFrame]) -> str:
+        # TO DO: (Егор, это пункт 7 в ТЗ)
+        # результирующие датафреймы result нужно записать в файлы excel
+        # (в будущем возможно и другие форматы) в папку "Результат", вернуть имя файла
+        pass
+
+    def clear(self):
+        del self.data
+        gc.collect()
+        self.data = {}
