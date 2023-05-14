@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
 
 
 class Ui_Upload(object):
@@ -100,13 +101,12 @@ class Ui_Upload(object):
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
         self.gridLayout_2.setColumnMinimumWidth(0, 461)
         self.gridLayout_2.setRowMinimumHeight(0, 254)
-
         self.retranslateUi(Upload)
         QtCore.QMetaObject.connectSlotsByName(Upload)
 
     def retranslateUi(self, Upload):
         _translate = QtCore.QCoreApplication.translate
-        Upload.setWindowTitle(_translate("Upload", "Upload"))
+        Upload.setWindowTitle(_translate("Upload", "Мирный атом"))
         self.buttonUpload.setText(_translate("Upload", "Загрузить документы"))
         self.buttonGet.setText(_translate("Upload", "Получить результат"))
         self.buttonProcess.setText(_translate("Upload", "Обработать"))
