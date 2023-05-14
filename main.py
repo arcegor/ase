@@ -49,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonUpload.setDisabled(True)
 
     def buttonProcess_clicked(self):
-        self.fm.pm.find_collisions(self.fm.data)
+        self.fm.process(self.fm.data)
         self.ui.buttonGet.setEnabled(True)
         self.ui.buttonProcess.setDisabled(True)
 
