@@ -3,3 +3,4 @@ pandas
 pyqt5-tools
 openpyxl
 PyInstaller
+qt-material

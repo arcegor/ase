@@ -2,12 +2,13 @@ import sys
 from pathlib import Path
 
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-from ProcessManager import ProcessManager
 from ui import Ui_Upload
 from FileManager import FileManager
 import pandas as pd
+import qt_material
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -28,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self,
             'Open file',
             './~',
-            "(*.xls *.xlsx)"
+            "(*.xls *.xlsx *.xslm)"
         )
         if filenames:
             filenames = [str(Path(filename)) for filename in filenames]
@@ -62,6 +63,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
+    qt_material.apply_stylesheet(app, theme='light_cyan.xml', invert_secondary=True)
+    app.setWindowIcon(QIcon('atom.ico'))
+    app.setStyle('Fusion')
     application = MainWindow()
     application.show()
     sys.exit(app.exec())
