@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self,
             'Open file',
             './~',
-            "(*.xls *.xlsx *.xslm)"
+            "(*.xls *.xlsx *.xlsm)"
         )
         if filenames:
             filenames = [str(Path(filename)) for filename in filenames]
@@ -49,14 +49,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonUpload.setDisabled(True)
 
     def buttonProcess_clicked(self):
-        self.fm.process(self.fm.data)
+        if not self.fm.process():
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Ошибка обработки!")
+            msg.setWindowTitle("Ошибка!")
+            msg.exec_()
+            return
         self.ui.buttonGet.setEnabled(True)
         self.ui.buttonProcess.setDisabled(True)
 
     def buttonGet_clicked(self):
-        self.fm.get_result(self.fm.result)
+        self.fm.get_result()
         self.fm.clear()
-        self.ui.files.setText('')
+        self.ui.files.setText('\n'.join(str(x) for x in self.fm.result.keys()))
         self.ui.buttonUpload.setEnabled(True)
         self.ui.buttonGet.setDisabled(True)
 

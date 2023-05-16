@@ -6,12 +6,13 @@ import pandas as pd
 class ProcessManager(object):
 
     @staticmethod
-    def find_collisions(data: list[pd.DataFrame]):
-        # TO DO: (Соня, это пункт 4-6 в ТЗ)
-        # Здесь нужно реализовать сам поиск коллизий.
-        # На вход подается список датафреймов (один эталонный и второй целевой).
-        # На выходе нужно вернуть два датафрейма: отчет о найденных ошибках и отредоктированный целевой документ
-        pass
+    def find_collisions(data: dict):
+        names = data.keys()
+        result = {}
+        for name in names:
+            name_new = re.split(' ', name)[-1]
+            result[name_new] = data[name].iloc[:10]
+        return result
 
     # Метод обрабатывает исходную строку с кодом KKS, возвращает список из буквенной и числовой части (частей) кода KKS,
     @staticmethod

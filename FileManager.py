@@ -12,20 +12,21 @@ class FileManager(object):
         self.result = {}
 
     def validate(self) -> bool:
-        # TO DO: (Ваня, это пункт 2-3 в ТЗ)
-        # сделать проверку данных на соответствие шаблону
-        # Результ True если все хорошо, False - иначе (тип bool)
-        pass
+        if self.data:
+            return True
 
-    def get_result(self, result: list[pd.DataFrame]) -> str:
-        # TO DO: (Егор, это пункт 7 в ТЗ)
-        # результирующие датафреймы result нужно записать в файлы excel
-        # (в будущем возможно и другие форматы) в папку "Результат", вернуть имя файла
-        pass
+    def get_result(self) -> list:
+        keys = self.result.keys()
+        for key in keys:
+            self.result[key].to_excel(key)
+        return list(keys)
 
-    def process(self, data):
-        self.result = pm.find_collisions(data)
-        pass
+    def process(self):
+        try:
+            self.result = pm.find_collisions(self.data)
+        except BaseException:
+            return False
+        return True
 
     def clear(self):
         del self.data
