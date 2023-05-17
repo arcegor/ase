@@ -1,6 +1,5 @@
 import gc
 
-import pandas as pd
 
 from ProcessManager import ProcessManager as pm
 
@@ -21,11 +20,14 @@ class FileManager(object):
             self.result[key].to_excel(key)
         return list(keys)
 
+    def preprocess(self):
+        keys = list(self.data.keys())
+        self.data['source'] = self.data.pop(keys[1])
+        self.data['target'] = self.data.pop(keys[0])
+
     def process(self):
-        try:
-            self.result = pm.find_collisions(self.data)
-        except BaseException:
-            return False
+        FileManager.preprocess(self)
+        self.result = pm.find_collisions(self.data)
         return True
 
     def clear(self):

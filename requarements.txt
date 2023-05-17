@@ -1,6 +1,7 @@
 PyQt5
 pandas
 pyqt5-tools
-openpyxl
+openpyxl==3.0.10
 PyInstaller
 qt-material
+xlrd

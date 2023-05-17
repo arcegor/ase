@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from ui import Ui_Upload
 from FileManager import FileManager
 import pandas as pd
-import qt_material
+import openpyxl
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -69,7 +69,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
-    qt_material.apply_stylesheet(app, theme='light_cyan.xml', invert_secondary=True)
     app.setWindowIcon(QIcon('atom.ico'))
     app.setStyle('Fusion')
     application = MainWindow()
