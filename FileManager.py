@@ -1,5 +1,5 @@
 import gc
-
+import os
 
 from ProcessManager import ProcessManager
 
@@ -18,9 +18,13 @@ class FileManager(object):
 
     def get_result(self) -> list:
         keys = self.result.keys()
+        path = os.getcwd() + '/RESULT'
+        if not os.path.exists(path):
+            os.makedirs(path)
         for key in keys:
-            key = self.pm.generate_name(self.source_filenames, key)
-            self.result[key].to_excel(key)
+            name = self.pm.generate_name(self.source_filenames, key)
+            filepath = os.path.join(path, name)
+            self.result[key].to_excel(filepath)
         return list(keys)
 
     def preprocess(self):
@@ -39,3 +43,5 @@ class FileManager(object):
         del self.data
         gc.collect()
         self.data = {}
+
+
