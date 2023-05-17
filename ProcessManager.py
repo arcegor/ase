@@ -1,5 +1,6 @@
 import re
 
+import numpy as np
 import pandas as pd
 
 
@@ -7,10 +8,11 @@ class ProcessManager(object):
 
     def __init__(self):
         super()
+        self.target_kks = set()
+        self.collision_count = []
 
-    @staticmethod
-    def find_collisions(data: dict):
-        result = {'target': ProcessManager.compare_frames_by_kks(data['source'], data['target'])}
+    def find_collisions(self, data: dict):
+        result = {'target': self.compare_frames_by_kks(data['source'], data['target'])}
         return result
 
     @staticmethod
@@ -52,23 +54,46 @@ class ProcessManager(object):
                 kks_set.add(item)
         return kks_set
 
-    @staticmethod
-    def create_source_set(source: pd.DataFrame):
+    def create_source_set(self, source: pd.DataFrame) -> set:
         res = set()
         df = source.iloc[:, 2].dropna().unique().tolist()[1:]
         for item in df:
-            item = ProcessManager.prepare_kks(item)
-            res = res.union(ProcessManager.create_kks_set(item))
+            item = self.prepare_kks(item)
+            res = res.union(self.create_kks_set(item))
         return res
 
-    @staticmethod
-    def compare_frames_by_kks(source: pd.DataFrame, target: pd.DataFrame):
-        source = ProcessManager.create_source_set(source)
-        target = target[['Код системы (KKS)', 'Толщина изоляции трубопро вода Sи,']]
+    def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame) -> pd.DataFrame:
+        self.target_kks = self.create_source_set(source)
+        try:
+            target[['Толщина изоляции трубопро вода Sи,']] = \
+                target.apply(
+                    lambda x: self.check_collision(x[['Код системы (KKS)']], x[['Толщина изоляции трубопро вода Sи,']]),
+                    axis=1)
+        except ValueError:
+            target[['Толщина изоляции трубопро вода Sи,']] = pd.DataFrame(self.collision_count)
         return target
 
+    def check_collision(self, x, y):
+        x, y = str(x.item()), str(y.item())
+        if y == 'nan':
+            self.collision_count.append(np.NaN)
+            return np.NaN
+        if y in ['-', '0']:
+            if x in self.target_kks:
+                self.collision_count.append(1)
+                return 1
+            else:
+                self.collision_count.append(0)
+                return 0
+        else:
+            if x not in self.target_kks:
+                self.collision_count.append(1)
+                return 0
+            else:
+                self.collision_count.append(0)
+                return 1
+
     @staticmethod
-    def generate_name(old_name) -> str:
-        name = re.split(r'[\/.]+', old_name)[-2]
-        name = name.join('.xlsm')
-        return name
+    def generate_name(old_names, name) -> str:
+        new_name = old_names[name]
+        return new_name
