@@ -1,10 +1,13 @@
+import copy
 import sys
 from pathlib import Path
 
+import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
-
+from openpyxl import load_workbook
+from openpyxl import Workbook
 from ui import Ui_Upload
 from FileManager import FileManager
 import pandas as pd
@@ -39,11 +42,17 @@ class MainWindow(QtWidgets.QMainWindow):
         filename, _ = QFileDialog.getOpenFileName(self, 'Open file', './~', '(*.xls *.xlsx *.xlsm)')
         if not filename:
             return
-        tmp = pd.ExcelFile.OpenpyxlReader(filename)
-        # self.fm.data['source'] = tmp.parse()
-        df = tmp.parse()
-        style = tmp.book
-        df.to_excel(filename, storage_options=style)
+        wb = self.fm.em.load_excel(filename)
+        df = pd.DataFrame(wb.active.values)
+        ws = wb.active
+        merged = copy.deepcopy(ws.merged_cells.ranges)
+        sn = ws.title
+        ws_new = self.fm.em.process_unmerge_cells(ws, merged)
+        ws_new = self.fm.em.process_merge_cells(ws_new, merged)
+        wb.active = ws_new
+
+        #wb_new = self.fm.em.update_spreadsheet(wb, df, 1, 1, sheet_name=sn)
+        flag = self.fm.em.save_excel(wb, '12345.xlsx')
         if self.is_valid():
             self.ui.buttonChooseTarget.setEnabled(True)
             self.ui.buttonChooseSource.setDisabled(True)

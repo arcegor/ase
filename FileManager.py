@@ -3,8 +3,8 @@ import os
 
 import pandas as pd
 
+from ExcelManager import ExcelManager
 from ProcessManager import ProcessManager
-import openpyxl
 
 
 class FileManager(object):
@@ -14,6 +14,7 @@ class FileManager(object):
         self.styles = {}
         self.result = {}
         self.pm = ProcessManager()
+        self.em = ExcelManager()
         self.source_filenames = {}
         self.flag_source = False
         self.flag_target = False
