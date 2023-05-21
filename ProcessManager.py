@@ -9,7 +9,8 @@ class ProcessManager(object):
     def __init__(self):
         super()
         self.target_kks = set()
-        self.collision_count = []
+        self.collisions_data = []
+        self.collisions_count = 0
 
     def find_collisions(self, data: dict):
         result = {'target': self.compare_frames_by_kks(data['source'], data['target'])}
@@ -65,32 +66,34 @@ class ProcessManager(object):
     def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame) -> pd.DataFrame:
         self.target_kks = self.create_source_set(source)
         try:
-            target[['Толщина изоляции трубопро вода Sи,']] = \
+            target[[10]] = \
                 target.apply(
-                    lambda x: self.check_collision(x[['Код системы (KKS)']], x[['Толщина изоляции трубопро вода Sи,']]),
+                    lambda x: self.check_collision(x[[1]], x[[10]]),
                     axis=1)
         except ValueError:
-            target[['Толщина изоляции трубопро вода Sи,']] = pd.DataFrame(self.collision_count)
+            target[[10]] = pd.DataFrame([x[0] for x in self.collisions_data])
         return target
 
     def check_collision(self, x, y):
         x, y = str(x.item()), str(y.item())
-        if y == 'nan':
-            self.collision_count.append(np.NaN)
+        if y == 'None':
+            self.collisions_data.append((np.NaN, 0))
             return np.NaN
         if y in ['-', '0']:
             if x in self.target_kks:
-                self.collision_count.append(1)
+                self.collisions_data.append((1, 1))
+                self.collisions_count += 1
                 return 1
             else:
-                self.collision_count.append(0)
+                self.collisions_data.append((0, 0))
                 return 0
         else:
             if x not in self.target_kks:
-                self.collision_count.append(1)
+                self.collisions_data.append((0, 1))
+                self.collisions_count += 1
                 return 0
             else:
-                self.collision_count.append(0)
+                self.collisions_data.append((1, 0))
                 return 1
 
     @staticmethod
