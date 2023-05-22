@@ -1,17 +1,16 @@
 import copy
 import gc
-import os
 
 import pandas as pd
 
 from ExcelManager import ExcelManager
 from ProcessManager import ProcessManager
-from ProgressBar import ProgressBar
 
 
 class FileManager(object):
 
     def __init__(self):
+        super()
         self.data = {}
         self.result = {}
         self.pm = ProcessManager()
@@ -19,7 +18,7 @@ class FileManager(object):
         self.workbook_data = {}
         self.source_filenames = {}
         self.merged_cells = {}
-        self.progress = ProgressBar()
+        self.percent = 0
 
     def validate(self) -> bool:
         if self.source_filenames:
@@ -45,6 +44,7 @@ class FileManager(object):
         wb_new.active = self.em.process_merge_cells(wb_new.active, self.merged_cells['target'], col=11)
         self.workbook_data['target'] = wb_new
         self.create_report()
+        self.percent = 100 * self.pm.collisions_count / len(self.pm.collisions_data)
         return True
 
     def create_report(self):

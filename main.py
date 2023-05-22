@@ -5,7 +5,6 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 from FileManager import FileManager
-from ProgressBar import ProgressBar
 from ui import Ui_Upload
 
 
@@ -33,7 +32,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonDownloadReport.setDisabled(True)
         self.ui.buttonChooseTarget.setDisabled(True)
         self.fm = FileManager()
-
         self.ui.SomeInfo.setHtml(self.html)
 
     def buttonChooseSource_clicked(self):
@@ -82,7 +80,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if not filename:
             return
         if self.fm.get_result(flag='report', filename=filename):
-            self.ui.SomeInfo.append('Отчет:\n' + filename)
+            self.ui.SomeInfo.append(f'Отчет:\n {filename} \n')
+            self.ui.SomeInfo.append(f'Количество найденных коллизий: {self.fm.pm.collisions_count} \n'
+                                    f'В процентах от общего числа: {int(self.fm.percent)}%')
             self.ui.buttonDownloadReport.setDisabled(True)
 
     def is_valid(self):
