@@ -14,7 +14,7 @@ class ExcelManager:
         return openpyxl.Workbook()
 
     @staticmethod
-    def update_spreadsheet(wb: openpyxl.Workbook, df, start_col: int, start_row: int, sheet_name: str):
+    def update_spreadsheet(wb: openpyxl.Workbook, df, start_col: int, start_row: int, sheet_name: str, progress):
         redFill = PatternFill(start_color='FFFF0000',
                               end_color='FFFF0000',
                               fill_type='solid')
@@ -23,7 +23,12 @@ class ExcelManager:
                 for ic in range(0, len(df.iloc[ir])):
                     wb[sheet_name].cell(start_row + ir, start_col + ic).value = df.iloc[ir][ic]
         if isinstance(df, list):
+            shift = 100 / len(df)
             for i in range(3, len(df)):
+
+                progress.setValue(i * shift)
+                progress.setFormat('Запись новых значений {0:.2f}%'.format(i * shift))
+
                 tmp = str(df[i][0])
                 flag = str(df[i][1])
                 if tmp == 'nan':
@@ -42,9 +47,12 @@ class ExcelManager:
         return wb.save(path)
 
     @staticmethod
-    def process_unmerge_cells(ws, merged=None, coords=None, col=None):
+    def process_unmerge_cells(ws, merged=None, coords=None, col=None, progress=None):
         if merged:
-            for group in list(merged):
+            shift = 100 / len(merged)
+            for index, group in enumerate(list(merged)):
+                progress.setValue(index * shift)
+                progress.setFormat('Подготовка excel к записи {0:.2f}%'.format(index * shift))
                 min_col, min_row, max_col, max_row = group.bounds
                 if min_col != col and min_row != max_row:
                     continue
@@ -75,9 +83,13 @@ class ExcelManager:
         return ws
 
     @staticmethod
-    def process_merge_cells(ws, merged=None, coords=None, col=None):
+    def process_merge_cells(ws, merged=None, coords=None, col=None, progress=None):
         if merged:
-            for group in list(merged):
+            shift = 100 / len(merged)
+            for index, group in enumerate(list(merged)):
+                progress.setValue(index * shift)
+                progress.setFormat('Форматирование excel {0:.2f}%'.format(index * shift))
+
                 min_col, min_row, max_col, max_row = group.bounds
                 if min_col != col and min_row != max_row:
                     continue
@@ -87,4 +99,5 @@ class ExcelManager:
             start_row, start_column, end_row, end_column = coords
             ws.merge_cells(start_row=start_row, start_column=start_column,
                            end_row=end_row, end_column=end_column)
+
         return ws

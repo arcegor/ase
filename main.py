@@ -2,7 +2,7 @@ import sys
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QProgressBar, QVBoxLayout
 
 from FileManager import FileManager
 from ui import Ui_Upload
@@ -19,7 +19,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.html = '<h3>Добро пожаловать!</h3>'
 
         # Progress bar
-
+        self.ui.progressBar.setValue(0)
         # Кнопки
         self.ui.buttonChooseSource.clicked.connect(self.buttonChooseSource_clicked)
         self.ui.buttonFindCollisions.clicked.connect(self.buttonFindCollisions_clicked)
@@ -55,13 +55,15 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.buttonFindCollisions.setEnabled(True)
 
     def buttonFindCollisions_clicked(self):
-        if not self.fm.process():
+        if not self.fm.process(self.ui.progressBar):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Ошибка обработки!")
             msg.setWindowTitle("Ошибка!")
             msg.exec_()
             return
+        self.ui.progressBar.setValue(100)
+        self.ui.progressBar.setFormat('Готово! {0:.2f}%'.format(100))
         self.ui.SomeInfo.append(f'Проверка успешно завершена!\nТеперь можно скачать исправленный файл!\n')
         self.ui.buttonDownloadReport.setEnabled(True)
         self.ui.buttonDownloadFixed.setEnabled(True)
@@ -102,6 +104,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonFindCollisions.setDisabled(True)
         self.ui.buttonChooseSource.setEnabled(True)
         self.ui.buttonChooseTarget.setDisabled(True)
+        self.ui.progressBar.setValue(0)
+        self.ui.progressBar.setFormat('{0:.2f}%'.format(0))
         self.ui.SomeInfo.setHtml(self.html)
 
 

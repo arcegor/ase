@@ -12,8 +12,8 @@ class ProcessManager(object):
         self.collisions_data = []
         self.collisions_count = 0
 
-    def find_collisions(self, data: dict):
-        result = {'target': self.compare_frames_by_kks(data['source'], data['target'])}
+    def find_collisions(self, data: dict, progress):
+        result = {'target': self.compare_frames_by_kks(data['source'], data['target'], progress)}
         return result
 
     @staticmethod
@@ -55,26 +55,36 @@ class ProcessManager(object):
                 kks_set.add(item)
         return kks_set
 
-    def create_source_set(self, source: pd.DataFrame) -> set:
+    def create_source_set(self, source: pd.DataFrame, progress) -> set:
         res = set()
         df = source.iloc[:, 2].dropna().unique().tolist()[1:]
-        for item in df:
+        shift = 50 / len(df)
+        for index, item in enumerate(df):
             item = self.prepare_kks(item)
             res = res.union(self.create_kks_set(item))
+
+            progress.setValue(index * shift)
+            progress.setFormat('Поиск коллизий {0:.2f}%'.format(index * shift))
+
+        progress.setValue(50)
+        progress.setFormat('Поиск коллизий {0:.2f}%'.format(50))
         return res
 
-    def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame) -> pd.DataFrame:
-        self.target_kks = self.create_source_set(source)
+    def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame, progress) -> pd.DataFrame:
+        self.target_kks = self.create_source_set(source, progress)
+        shift = 50 / len(target[[10]])
         try:
             target[[10]] = \
                 target.apply(
-                    lambda x: self.check_collision(x[[1]], x[[10]]),
+                    lambda x: self.check_collision(x[[1]], x[[10]], progress, shift),
                     axis=1)
         except ValueError:
             target[[10]] = pd.DataFrame([x[0] for x in self.collisions_data])
         return target
 
-    def check_collision(self, x, y):
+    def check_collision(self, x, y, progress, shift):
+        progress.setValue(len(self.collisions_data) * shift)
+        progress.setFormat('Поиск коллизий {0:.2f}%'.format(len(self.collisions_data) * shift))
         x, y = str(x.item()), str(y.item())
         if y == 'None':
             self.collisions_data.append((np.NaN, 0))

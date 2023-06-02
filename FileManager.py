@@ -1,6 +1,10 @@
 import copy
 import gc
+import threading
+import time
+from threading import Thread
 
+import numpy as np
 import pandas as pd
 
 from ExcelManager import ExcelManager
@@ -34,14 +38,26 @@ class FileManager(object):
             self.preprocess_excel(self.source_filenames[key], key)
             self.get_merged_cells(key)
 
-    def process(self):
+    @staticmethod
+    def shift_progress(progress):
+        for i in range(10000000):
+            progress.setValue(i / 100000)
+            progress.setFormat('Подготовка {0:.2f}%'.format(i / 100000))
+
+    def process(self, progress):
+        th = Thread(target=FileManager.shift_progress, args=(progress,))
+        th.start()
         self.preprocess()
-        self.result = self.pm.find_collisions(self.data)
+        th.join()
+        self.result = self.pm.find_collisions(self.data, progress)
         wb = self.workbook_data['target']
-        wb.active = self.em.process_unmerge_cells(wb.active, merged=self.merged_cells['target'],
-                                                  coords=(2, 10, len(self.result['target']), 11), col=11)
-        wb_new = self.em.update_spreadsheet(wb, self.pm.collisions_data, 11, 2, wb.active.title)
-        wb_new.active = self.em.process_merge_cells(wb_new.active, self.merged_cells['target'], col=11)
+        wb.active = self.em.process_unmerge_cells(wb.active, merged=self.merged_cells['target'], col=11,
+                                                  progress=progress)
+
+        wb_new = self.em.update_spreadsheet(wb, self.pm.collisions_data, 11, 2, wb.active.title, progress)
+
+        wb_new.active = self.em.process_merge_cells(wb_new.active, self.merged_cells['target'], col=11,
+                                                    progress=progress)
         self.workbook_data['target'] = wb_new
         self.create_report()
         self.percent = 100 * self.pm.collisions_count / len(self.pm.collisions_data)
@@ -70,4 +86,3 @@ class FileManager(object):
         ws = self.workbook_data[key].active
         merged = copy.deepcopy(ws.merged_cells.ranges)
         self.merged_cells[key] = merged
-
