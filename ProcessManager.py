@@ -55,7 +55,7 @@ class ProcessManager(object):
                 kks_set.add(item)
         return kks_set
 
-    def create_source_set(self, source: pd.DataFrame, progress) -> set:
+    def create_source_set(self, source: pd.DataFrame, progress):
         res = set()
         df = source.iloc[:, 2].dropna().unique().tolist()[1:]
         shift = 50 / len(df)
@@ -65,13 +65,10 @@ class ProcessManager(object):
 
             progress.setValue(index * shift)
             progress.setFormat('Поиск коллизий {0:.2f}%'.format(index * shift))
-
-        progress.setValue(50)
-        progress.setFormat('Поиск коллизий {0:.2f}%'.format(50))
-        return res
+        return res, progress
 
     def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame, progress) -> pd.DataFrame:
-        self.target_kks = self.create_source_set(source, progress)
+        self.target_kks, progress = self.create_source_set(source, progress)
         shift = 50 / len(target[[10]])
         try:
             target[[10]] = \

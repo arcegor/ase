@@ -1,5 +1,6 @@
 import copy
 import gc
+import sys
 import threading
 import time
 from threading import Thread
@@ -41,8 +42,8 @@ class FileManager(object):
     @staticmethod
     def shift_progress(progress):
         for i in range(10000000):
-            progress.setValue(i / 100000)
-            progress.setFormat('Подготовка {0:.2f}%'.format(i / 100000))
+            progress.setValue(i * 0.00001)
+            progress.setFormat('Подготовка {0:.2f}%'.format(i * 0.00001))
 
     def process(self, progress):
         th = Thread(target=FileManager.shift_progress, args=(progress,))
