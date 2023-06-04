@@ -104,8 +104,3 @@ class ProcessManager(object):
             else:
                 self.collisions_data.append((1, 0))
                 return 1
-
-    @staticmethod
-    def generate_name(old_names, name) -> str:
-        new_name = re.split(r'[\\/.]+', old_names[name])[-2] + '.xlsx'
-        return new_name

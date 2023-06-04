@@ -1,4 +1,6 @@
 import sys
+import threading
+import traceback
 from threading import Thread
 
 from PyQt5 import QtWidgets
@@ -59,6 +61,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.buttonFindCollisions.setEnabled(True)
 
     def buttonFindCollisions_clicked(self):
+        self.ui.buttonFindCollisions.setDisabled(True)
+        self.ui.buttonReset.setDisabled(True)
         if not self.fm.process(self.ui.progressBar):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -67,11 +71,11 @@ class MainWindow(QtWidgets.QMainWindow):
             msg.exec_()
             return
         self.ui.progressBar.setValue(100)
-        self.ui.progressBar.setFormat('Готово! {0:.2f}%'.format(100))
+        self.ui.progressBar.setFormat('Готово! {0}%'.format(100))
         self.ui.SomeInfo.append(f'Проверка успешно завершена!\nТеперь можно скачать исправленный файл!\n')
         self.ui.buttonDownloadReport.setEnabled(True)
         self.ui.buttonDownloadFixed.setEnabled(True)
-        self.ui.buttonFindCollisions.setDisabled(True)
+        self.ui.buttonReset.setEnabled(True)
 
     def buttonDownloadFixed_clicked(self):
         filename, _ = QFileDialog.getSaveFileName(None, "Save Fixed File", './~', '(*.xlsx)')
@@ -129,6 +133,7 @@ class CalcWindow(QWidget):
         try:
             self.pc.process_calc()
         except Exception:
+            traceback.print_exc()
             return
 
 

@@ -3,6 +3,7 @@ import gc
 from threading import Thread
 
 import pandas as pd
+from PyQt5.QtCore import QThread
 
 from ExcelManager import ExcelManager
 from ProcessManager import ProcessManager
@@ -35,14 +36,10 @@ class FileManager(object):
             self.preprocess_excel(self.source_filenames[key], key)
             self.get_merged_cells(key)
 
-    @staticmethod
-    def shift_progress(progress):
-        for i in range(100000):
-            progress.setValue(i * 0.00001)
-            progress.setFormat('Подготовка {}%'.format(i * 0.00001))
-
     def process(self, progress):
-        self.preprocess()
+        th = Thread(target=self.preprocess())
+        th.start()
+        th.join()
         self.result = self.pm.find_collisions(self.data, progress)
         wb = self.workbook_data['target']
         wb.active = self.em.process_unmerge_cells(wb.active, merged=self.merged_cells['target'], col=11,
