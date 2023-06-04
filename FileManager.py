@@ -1,11 +1,7 @@
 import copy
 import gc
-import sys
-import threading
-import time
 from threading import Thread
 
-import numpy as np
 import pandas as pd
 
 from ExcelManager import ExcelManager
@@ -41,15 +37,12 @@ class FileManager(object):
 
     @staticmethod
     def shift_progress(progress):
-        for i in range(10000000):
+        for i in range(100000):
             progress.setValue(i * 0.00001)
-            progress.setFormat('Подготовка {0:.2f}%'.format(i * 0.00001))
+            progress.setFormat('Подготовка {}%'.format(i * 0.00001))
 
     def process(self, progress):
-        th = Thread(target=FileManager.shift_progress, args=(progress,))
-        th.start()
         self.preprocess()
-        th.join()
         self.result = self.pm.find_collisions(self.data, progress)
         wb = self.workbook_data['target']
         wb.active = self.em.process_unmerge_cells(wb.active, merged=self.merged_cells['target'], col=11,
@@ -85,5 +78,5 @@ class FileManager(object):
 
     def get_merged_cells(self, key):
         ws = self.workbook_data[key].active
-        merged = copy.deepcopy(ws.merged_cells.ranges)
+        merged = copy.copy(ws.merged_cells.ranges)
         self.merged_cells[key] = merged

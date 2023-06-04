@@ -11,9 +11,11 @@ class ProcessManager(object):
         self.target_kks = set()
         self.collisions_data = []
         self.collisions_count = 0
+        self.target_result = None
 
     def find_collisions(self, data: dict, progress):
         result = {'target': self.compare_frames_by_kks(data['source'], data['target'], progress)}
+        self.target_result = result['target']
         return result
 
     @staticmethod
@@ -64,7 +66,7 @@ class ProcessManager(object):
             res = res.union(self.create_kks_set(item))
 
             progress.setValue(index * shift)
-            progress.setFormat('Поиск коллизий {0:.2f}%'.format(index * shift))
+            progress.setFormat('Поиск коллизий {}%'.format(index * shift))
         return res, progress
 
     def compare_frames_by_kks(self, source: pd.DataFrame, target: pd.DataFrame, progress) -> pd.DataFrame:
@@ -81,7 +83,7 @@ class ProcessManager(object):
 
     def check_collision(self, x, y, progress, shift):
         progress.setValue(len(self.collisions_data) * shift)
-        progress.setFormat('Поиск коллизий {0:.2f}%'.format(len(self.collisions_data) * shift))
+        progress.setFormat('Поиск коллизий {}%'.format(len(self.collisions_data) * shift))
         x, y = str(x.item()), str(y.item())
         if y == 'None':
             self.collisions_data.append((np.NaN, 0))

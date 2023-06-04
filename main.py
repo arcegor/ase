@@ -1,10 +1,13 @@
 import sys
+from threading import Thread
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QProgressBar, QVBoxLayout
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QProgressBar, QVBoxLayout, QWidget
 
+from CalcManager import CalcManager
 from FileManager import FileManager
+from calc import Ui_Form
 from ui import Ui_Upload
 
 
@@ -27,6 +30,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.buttonDownloadReport.clicked.connect(self.buttonDownloadReport_clicked)
         self.ui.buttonChooseTarget.clicked.connect(self.buttonChooseTarget_clicked)
         self.ui.buttonReset.clicked.connect(self.buttonReset_clicked)
+        self.ui.buttonCalculator.clicked.connect(self.buttonCalculator_clicked)
         self.ui.buttonFindCollisions.setDisabled(True)
         self.ui.buttonDownloadFixed.setDisabled(True)
         self.ui.buttonDownloadReport.setDisabled(True)
@@ -107,6 +111,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.progressBar.setValue(0)
         self.ui.progressBar.setFormat('{0:.2f}%'.format(0))
         self.ui.SomeInfo.setHtml(self.html)
+
+    def buttonCalculator_clicked(self):
+        self.cw = CalcWindow(self.fm.pm.target_result)
+
+
+class CalcWindow(QWidget):
+    def __init__(self, data):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+        self.ui.doCalcButton.clicked.connect(self.doCalcButton_clicked)
+        self.pc = CalcManager(data)
+        self.show()
+
+    def doCalcButton_clicked(self):
+        try:
+            self.pc.process_calc()
+        except Exception:
+            return
 
 
 if __name__ == '__main__':

@@ -135,6 +135,20 @@
       </item>
      </layout>
     </item>
+    <item row="4" column="0">
+     <widget class="QPushButton" name="buttonCalculator">
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <stylestrategy>PreferDefault</stylestrategy>
+       </font>
+      </property>
+      <property name="text">
+       <string>Калькулятор</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout">
       <property name="sizeConstraint">

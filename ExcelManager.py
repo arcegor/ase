@@ -27,7 +27,7 @@ class ExcelManager:
             for i in range(3, len(df)):
 
                 progress.setValue(i * shift)
-                progress.setFormat('Запись новых значений {0:.2f}%'.format(i * shift))
+                progress.setFormat('Запись новых значений {}%'.format(i * shift))
 
                 tmp = str(df[i][0])
                 flag = str(df[i][1])
@@ -40,7 +40,7 @@ class ExcelManager:
 
     @staticmethod
     def load_excel(path: str):
-        return openpyxl.load_workbook(path)
+        return openpyxl.load_workbook(path, keep_links=False)
 
     @staticmethod
     def save_excel(wb, path):
@@ -52,7 +52,7 @@ class ExcelManager:
             shift = 100 / len(merged)
             for index, group in enumerate(list(merged)):
                 progress.setValue(index * shift)
-                progress.setFormat('Подготовка excel к записи {0:.2f}%'.format(index * shift))
+                progress.setFormat('Подготовка excel к записи {}%'.format(index * shift))
                 min_col, min_row, max_col, max_row = group.bounds
                 if min_col != col and min_row != max_row:
                     continue
@@ -88,7 +88,7 @@ class ExcelManager:
             shift = 100 / len(merged)
             for index, group in enumerate(list(merged)):
                 progress.setValue(index * shift)
-                progress.setFormat('Форматирование excel {0:.2f}%'.format(index * shift))
+                progress.setFormat('Форматирование excel {}%'.format(index * shift))
 
                 min_col, min_row, max_col, max_row = group.bounds
                 if min_col != col and min_row != max_row:
