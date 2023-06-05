@@ -70,6 +70,16 @@ background-color: rgb(177, 255, 87);</string>
     <string>Посчитать</string>
    </property>
   </widget>
+  <widget class="QTextBrowser" name="textBrowser">
+   <property name="geometry">
+    <rect>
+     <x>35</x>
+     <y>121</y>
+     <width>551</width>
+     <height>211</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

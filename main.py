@@ -135,6 +135,7 @@ class CalcWindow(QWidget):
         except Exception:
             traceback.print_exc()
             return
+        self.ui.textBrowser.setText(str(self.pc.result))
 
 
 if __name__ == '__main__':

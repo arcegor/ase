@@ -128,7 +128,7 @@ class CalcManager(object):
 
     def calc_trees(self, trees):
         tree_limit = 1500
-        result = {'count': 0, '6': 0, '9': 0}
+        result = {'count': 0, '3.5': 0, '6': 0, '9': 0}
         for tree in trees:
             down, up = tree[1], tree[2]
             for subtree in tree[0]:
@@ -146,10 +146,12 @@ class CalcManager(object):
                     continue
                 for j in n_a:
                     result[j] = []
-                    result[j] += [order_number, kks, heat_isolation, diff]
+                    result[j].append([order_number, kks, heat_isolation, diff])
                 result['count'] += 1
-                if diff < 6:
+                if diff < 3500:
+                    result['3.5'] += 1
+                if diff < 6000:
                     result['6'] += 1
-                if diff < 9:
+                if diff < 9000:
                     result['9'] += 1
         self.result = result
