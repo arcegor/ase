@@ -78,9 +78,10 @@ class CalcManager(object):
     def process_trees(self, indexes):
         result = []
         for scope in indexes:
-            start, stop, flag, down, top = scope[0] + 1, scope[1], scope[2][0], scope[2][1], scope[2][2]
+            start, stop, flag, down, up = scope[0] + 1, scope[1], scope[2][0], scope[2][1], scope[2][2]
             df_temp = self.data.iloc[start:stop, :]
-            result += self.process_scope(df_temp, flag)
+            tmp = self.process_scope(df_temp, flag), down, up
+            result.append(tmp)
         return result
 
     @staticmethod
@@ -120,9 +121,35 @@ class CalcManager(object):
                 z = None
             if isinstance(row[0], int):
                 order_number, kks, depth, heat_isolation, neighbouring_areas = row[0], row[1], row[6], row[10], row[13]
+        if z is None:
+            return res
         res.append([order_number, kks, depth, heat_isolation, neighbouring_areas, z])
         return res
 
     def calc_trees(self, trees):
+        tree_limit = 1500
+        result = {'count': 0, '6': 0, '9': 0}
         for tree in trees:
-            pass
+            down, up = tree[1], tree[2]
+            for subtree in tree[0]:
+                diff = 0
+                order_number, kks, depth, heat_isolation, neighbouring_areas, z = subtree[0], subtree[1], subtree[2], \
+                    subtree[3], subtree[4], subtree[5]
+                if z is None:
+                    continue
+                n_a = [x.replace(' ', '') for x in re.split('/', neighbouring_areas)]
+                if down is not None:
+                    diff = abs(z) - abs(down)
+                elif up is not None:
+                    diff = abs(z) - abs(up)
+                if diff < tree_limit:
+                    continue
+                for j in n_a:
+                    result[j] = []
+                    result[j] += [order_number, kks, heat_isolation, diff]
+                result['count'] += 1
+                if diff < 6:
+                    result['6'] += 1
+                if diff < 9:
+                    result['9'] += 1
+        self.result = result
